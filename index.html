@@ -540,7 +540,7 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         appendNotes(exp);
         var ws = XLSX.utils.json_to_sheet(exp); ws["!cols"] = [{wch:6},{wch:30},{wch:35},{wch:14},{wch:14},{wch:25},{wch:25}];
         var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data Sparepart");
-        XLSX.writeFile(wb, "sparepart_data.xlsx"); showToast("File Excel berhasil diunduh.", "success");
+        XLSX.writeFile(wb, "sparepart Bekas Report.xlsx"); showToast("File Excel berhasil diunduh.", "success");
     });
 
     // ========== EXPORT PDF TAB 2 (TEKS MEMANJANG KE SAMPING, QTY KECIL) ==========
