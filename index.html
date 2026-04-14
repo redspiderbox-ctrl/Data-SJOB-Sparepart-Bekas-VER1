@@ -564,7 +564,7 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
             ]);
         }
 
-        doc.setFontSize(16); doc.setTextColor(30, 41, 59); doc.text("Laporan Data Sparepart", mg.left, 18);
+        doc.setFontSize(16); doc.setTextColor(30, 41, 59); doc.text("Laporan Data Sparepart Bekas", mg.left, 18);
         doc.setFontSize(8); doc.setTextColor(100, 116, 139); doc.text("Dicetak: " + new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }), mg.left, 24);
 
         doc.autoTable({
@@ -609,7 +609,7 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         doc.setTextColor(5, 150, 105); doc.text(String(gt), uw - 8, fy + 7, { align: "right" });
         
         appendNotesPDF(doc, fy);
-        doc.save("Sparepart Bekas report.pdf"); showToast("File PDF berhasil diunduh.", "success");
+        doc.save("Laporan Data Sparepart Bekas.pdf"); showToast("File PDF berhasil diunduh.", "success");
     });
 
     // ========== EXPORT EXCEL TAB 3 ==========
