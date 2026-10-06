@@ -264,10 +264,7 @@ td[contenteditable] {
 td[contenteditable]:hover { border-color: var(--border-light); }
 td[contenteditable]:focus { background: var(--primary-subtle); border-color: var(--primary); }
 
-td.read-only-cell {
-    background: transparent; 
-    cursor: default; 
-}
+td.read-only-cell { background: transparent; cursor: default; }
 
 td.no-urut {
     font-weight: 700; color: var(--primary); text-align: center;
@@ -672,7 +669,9 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
     }
 
     // ===== MODIFIKASI: NAMA FILE EXPORT TAB 5 (TAGIHAN RETURN) =====
-    var BASE_NAME_5 = "Tagihan SOB OPEN Sparepart Bekas HD";
+    // Base name berbeda antara JPEG (dengan "HD") dan PDF/Excel (tanpa "HD")
+    var BASE_NAME_5_HD  = "Tagihan SOB OPEN Sparepart Bekas HD";
+    var BASE_NAME_5_STD = "Tagihan SOB OPEN Sparepart Bekas";
 
     // Ambil daftar Teknisi Perbaikan unik dari data Tab 5
     function getTeknisiSuffix5() {
@@ -693,9 +692,12 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         return String(name).replace(/[\\/:*?"<>|\r\n\t]/g, " ").replace(/\s+/g, " ").trim();
     }
 
-    // Bangun nama file lengkap, mis: "Tagihan SOB OPEN Sparepart Bekas HD NOSENCIUS A.V. FAOT.xlsx"
-    function buildFileName5(ext) {
-        return sanitizeFileName(BASE_NAME_5 + getTeknisiSuffix5()) + "." + ext;
+    // Bangun nama file lengkap
+    // pakaiHD = true  -> "Tagihan SOB OPEN Sparepart Bekas HD <TEKNISI>.<ext>"  (untuk JPEG)
+    // pakaiHD = false -> "Tagihan SOB OPEN Sparepart Bekas <TEKNISI>.<ext>"     (untuk PDF & Excel)
+    function buildFileName5(ext, pakaiHD) {
+        var base = pakaiHD ? BASE_NAME_5_HD : BASE_NAME_5_STD;
+        return sanitizeFileName(base + getTeknisiSuffix5()) + "." + ext;
     }
     // ===== END MODIFIKASI =====
 
@@ -1537,7 +1539,7 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
     });
 
     // Tab 5 (TAGIHAN RETURN) - Export Excel
-    // ===== MODIFIKASI: gunakan buildFileName5 =====
+    // ===== MODIFIKASI: gunakan buildFileName5(ext, pakaiHD=false) =====
     $("#excelBtn5").addEventListener("click", function() { 
         if(!data5.length){showToast("Tidak ada data.","danger");return;} 
         var wb = XLSX.utils.book_new();
@@ -1570,12 +1572,12 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         ws["!cols"]=[{wch:6},{wch:30},{wch:30},{wch:14},{wch:14},{wch:25},{wch:25},{wch:15}];
         
         XLSX.utils.book_append_sheet(wb,ws,"Tagihan SOB OPEN Sparepart Bekas");
-        XLSX.writeFile(wb, buildFileName5("xlsx"));
+        XLSX.writeFile(wb, buildFileName5("xlsx", false));   // <- tanpa "HD"
         showToast("File Excel berhasil diunduh.","success"); 
     });
 
     // Tab 5 (TAGIHAN RETURN) - Export PDF
-    // ===== MODIFIKASI: gunakan buildFileName5 =====
+    // ===== MODIFIKASI: gunakan buildFileName5(ext, pakaiHD=false) =====
     $("#pdfBtn5").addEventListener("click", function() { 
         if(!data5.length){showToast("Tidak ada data.","danger");return;} 
         var doc=new jsPDF({orientation:"l", unit:"mm", format:"a4"}), pw=doc.internal.pageSize.getWidth(), mg={left:12, right:12}; 
@@ -1619,12 +1621,12 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         doc.text("TOTAL QTY:", totX, fy+7, {align:"left"}); 
         doc.setTextColor(5,150,105); doc.text(String(gt), totX + 25, fy+7, {align:"left"}); 
         
-        doc.save(buildFileName5("pdf")); 
+        doc.save(buildFileName5("pdf", false));   // <- tanpa "HD"
         showToast("File PDF berhasil diunduh.","success"); 
     });
 
     // --- FITUR JPEG HD TAB 5 ---
-    // ===== MODIFIKASI: gunakan buildFileName5 =====
+    // ===== MODIFIKASI: gunakan buildFileName5(ext, pakaiHD=true) =====
     $("#jpegBtn5").addEventListener("click", function() {
         if(!data5.length){showToast("Tidak ada data untuk di-export.","danger");return;}
         
@@ -1693,7 +1695,7 @@ tfoot td { padding: 12px; border-bottom: none; border-top: 2px solid var(--borde
         }).then(function(canvas) {
             document.body.removeChild(container);
             var link = document.createElement('a');
-            link.download = buildFileName5("jpeg");
+            link.download = buildFileName5("jpeg", true);   // <- dengan "HD"
             link.href = canvas.toDataURL('image/jpeg', 0.95); 
             link.click();
             showToast("File JPEG HD berhasil diunduh.", "success");
